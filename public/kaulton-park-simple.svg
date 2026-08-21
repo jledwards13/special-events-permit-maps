@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 869 508" role="img" aria-labelledby="title desc">
+  <title id="title">Kaulton Park simplified site plan</title>
+  <desc id="desc">Black-and-white overhead plan showing the park boundary, surrounding streets, baseball infield, pavilion, playground, paths, and trees.</desc>
+  <rect width="869" height="508" fill="#eceff0"/>
+  <path d="M0 400 L128 367 C91 322 78 257 91 206 C106 146 156 91 222 60 C302 22 411 3 527 12 C655 22 754 73 806 148 C842 200 850 279 824 344 L869 370 L869 508 L0 508Z" fill="#d4d8da"/>
+  <path d="M123 353 C91 309 86 249 103 201 C123 145 167 101 229 72 C303 37 408 21 518 30 C633 40 724 84 779 148 C817 193 826 257 806 318 C789 365 760 391 718 405 C630 436 529 439 425 432 C324 425 205 404 147 373Z" fill="#fafafa" stroke="#343b40" stroke-width="4"/>
+  <path d="M139 339 C113 302 109 253 123 213 C140 166 180 124 239 98 C306 68 400 53 500 61 C604 69 690 107 743 160 C779 196 788 251 771 300 C757 341 730 366 689 378 C609 402 520 405 429 399 C337 394 235 376 177 357Z" fill="#f7f7f5" stroke="#8a9297" stroke-width="2"/>
+  <path d="M120 354 C230 393 342 414 463 420 C587 426 707 415 809 366" fill="none" stroke="#fff" stroke-width="28"/>
+  <path d="M120 354 C230 393 342 414 463 420 C587 426 707 415 809 366" fill="none" stroke="#6f777c" stroke-width="2"/>
+  <path d="M105 197 C152 106 263 54 404 37 C560 18 706 69 783 157" fill="none" stroke="#fff" stroke-width="28"/>
+  <path d="M105 197 C152 106 263 54 404 37 C560 18 706 69 783 157" fill="none" stroke="#6f777c" stroke-width="2"/>
+  <circle cx="244" cy="221" r="55" fill="#dedede" stroke="#343b40" stroke-width="3"/>
+  <path d="M205 183 Q244 162 282 184 Q298 221 280 258 Q243 277 207 257 Q187 221 205 183Z" fill="#f4f4f4" stroke="#7d858a" stroke-width="2"/>
+  <rect x="397" y="73" width="30" height="22" rx="3" fill="#bfc5c8" stroke="#343b40" stroke-width="3"/>
+  <rect x="525" y="198" width="52" height="27" rx="7" fill="#d4d8da" stroke="#343b40" stroke-width="3"/>
+  <path d="M534 211 h34 M551 201 v21" stroke="#777f84" stroke-width="2"/>
+  <g fill="#d9dddf" stroke="#343b40" stroke-width="2">
+    <circle cx="315" cy="132" r="13"/><circle cx="358" cy="164" r="12"/><circle cx="449" cy="140" r="14"/>
+    <circle cx="496" cy="194" r="12"/><circle cx="620" cy="122" r="15"/><circle cx="680" cy="178" r="12"/>
+    <circle cx="329" cy="300" r="14"/><circle cx="411" cy="334" r="12"/><circle cx="520" cy="313" r="15"/>
+    <circle cx="615" cy="291" r="13"/><circle cx="693" cy="318" r="15"/>
+  </g>
+  <g stroke="#858d92" stroke-width="2" fill="none">
+    <path d="M103 404 L90 508"/><path d="M222 397 L209 508"/><path d="M740 405 L754 508"/>
+    <path d="M75 209 L0 164"/><path d="M809 163 L869 132"/>
+  </g>
+  <path d="M0 438 H869 M0 459 H869" stroke="#a1a8ac" stroke-width="2" stroke-dasharray="18 12"/>
+  <path d="M0 19 H869 M0 39 H869" stroke="#a1a8ac" stroke-width="2" stroke-dasharray="18 12" opacity=".7"/>
+</svg>
