@@ -454,11 +454,6 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
   return (
     <main>
       <header className="cityHeader">
-        <img
-          className="cityLogo"
-          src="/city-of-tuscaloosa-logo.png"
-          alt="City of Tuscaloosa logo"
-        />
         <div>
           <p>CITY OF TUSCALOOSA</p>
           <h1>Special Event Site Plan Builder</h1>
