@@ -187,10 +187,10 @@ const locations: Record<
   springbrook: {
     name: "Springbrook Park",
     simple: "",
-    satellite: "/springbrook-park-satellite.jpeg",
-    alt: "Springbrook Park",
+    satellite: "/springbrook-park-satellite-renovated.png",
+    alt: "Updated overhead aerial view of renovated Springbrook Park",
     roads: false,
-    ratio: 1.374,
+    ratio: 1.887,
     rates: ["$100/hr ($400 minimum)"],
   },
   riverwalk: {
@@ -835,7 +835,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               placeholder="Include dimensions, access instructions, power needs, or other information…"
             />
           </label>
-          {(["snow-hinton", "springbrook", "kaulton"] as LocationKey[]).includes(location) && (
+          {(["snow-hinton", "kaulton"] as LocationKey[]).includes(location) && (
             <section className="mapNotice">
               <b>Map update notice</b>
               <p>Renovations have taken place at this park. Some features shown on the aerial map may differ from the current site.</p>
