@@ -738,6 +738,43 @@ footer {
 .viewToggle button:hover:not(.active) {
   background: #e7ecef;
 }
+.mapZoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #aeb9c1;
+  border-radius: 5px;
+  background: #f4f6f7;
+}
+.mapZoom button {
+  min-width: 30px;
+  border: 0;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--navy);
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mapZoom button:hover:not(:disabled) {
+  background: #e7ecef;
+}
+.mapZoom button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.mapZoom span {
+  min-width: 40px;
+  color: #41515d;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+.mapFrame.location-springbrook > img {
+  transform-origin: center;
+}
 .printValue {
   display: none;
 }
@@ -852,6 +889,7 @@ footer {
   }
   .printButton,
   .viewToggle,
+  .mapZoom,
   .toolPanel,
   .resizeHandle,
   .rotateHandle,
