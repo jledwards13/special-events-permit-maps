@@ -774,6 +774,13 @@ footer {
 }
 .mapFrame.location-springbrook > img {
   transform-origin: center;
+  pointer-events: none;
+}
+.mapFrame.location-springbrook {
+  cursor: grab;
+}
+.mapFrame.location-springbrook:active {
+  cursor: grabbing;
 }
 .printValue {
   display: none;
