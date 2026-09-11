@@ -240,6 +240,7 @@ export default function Home() {
   const [mapView, setMapView] = useState<"simple" | "satellite">("simple");
   const [location, setLocation] = useState<LocationKey>("government-plaza");
   const [staticZoom, setStaticZoom] = useState(1);
+  const [staticCenter, setStaticCenter] = useState({ x: 50, y: 50 });
   const [, setMapRevision] = useState(0);
   const mapIsInteractive =
     location === "city-streets" || location === "riverwalk";
@@ -251,6 +252,18 @@ export default function Home() {
   );
   const activeLocation = locations[location];
   const effectiveZoom = location === "springbrook" ? staticZoom : 1;
+  const clampCenter = (value: number, zoom: number) => {
+    const edge = 50 / zoom;
+    return Math.max(edge, Math.min(100 - edge, value));
+  };
+  const changeStaticZoom = (nextZoom: number) => {
+    const zoom = Math.max(1, Math.min(2, nextZoom));
+    setStaticZoom(zoom);
+    setStaticCenter((center) => ({
+      x: clampCenter(center.x, zoom),
+      y: clampCenter(center.y, zoom),
+    }));
+  };
   const handleMapViewChange = useCallback(
     () => setMapRevision((v) => v + 1),
     [],
@@ -355,6 +368,45 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     setSelected(null);
     setMapView(next === "government-plaza" ? "simple" : "satellite");
     setStaticZoom(next === "springbrook" ? 1.25 : 1);
+    setStaticCenter({ x: 50, y: 50 });
+  };
+  const panStaticMap = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (location !== "springbrook") return;
+    event.preventDefault();
+    const target = event.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startCenter = staticCenter;
+    target.setPointerCapture(event.pointerId);
+    const move = (e: PointerEvent) => {
+      setStaticCenter({
+        x: clampCenter(startCenter.x - ((e.clientX - startX) / rect.width) * (100 / effectiveZoom), effectiveZoom),
+        y: clampCenter(startCenter.y - ((e.clientY - startY) / rect.height) * (100 / effectiveZoom), effectiveZoom),
+      });
+    };
+    const up = () => {
+      target.removeEventListener("pointermove", move);
+      target.removeEventListener("pointerup", up);
+    };
+    target.addEventListener("pointermove", move);
+    target.addEventListener("pointerup", up);
+  };
+  const zoomStaticMapAtPointer = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (location !== "springbrook") return;
+    event.preventDefault();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const relativeX = (event.clientX - rect.left) / rect.width;
+    const relativeY = (event.clientY - rect.top) / rect.height;
+    const nextZoom = Math.max(1, Math.min(2, effectiveZoom + (event.deltaY < 0 ? 0.25 : -0.25)));
+    if (nextZoom === effectiveZoom) return;
+    const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
+    const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
+    setStaticZoom(nextZoom);
+    setStaticCenter({
+      x: clampCenter(worldX - (relativeX - 0.5) * (100 / nextZoom), nextZoom),
+      y: clampCenter(worldY - (relativeY - 0.5) * (100 / nextZoom), nextZoom),
+    });
   };
   const pointerDown = (event: React.PointerEvent, item: PlacedItem) => {
     event.preventDefault();
@@ -369,11 +421,11 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
       const relativeY = (e.clientY - r.top) / r.height;
       const x = Math.max(
         2,
-        Math.min(98, (0.5 + (relativeX - 0.5) / effectiveZoom) * 100),
+        Math.min(98, staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom)),
       );
       const y = Math.max(
         2,
-        Math.min(98, (0.5 + (relativeY - 0.5) / effectiveZoom) * 100),
+        Math.min(98, staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom)),
       );
       const geo = mapIsInteractive
         ? streetMapRef.current?.percentToLatLng(x, y)
@@ -594,6 +646,8 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               <p>
                 {mapIsInteractive
                   ? "Pan or zoom freely—placed items remain anchored to their map location"
+                  : location === "springbrook"
+                    ? "Drag to move around the park • Scroll or use +/− to zoom"
                   : activeLocation.roads
                     ? "North is at the top • Road labels are for orientation"
                     : "North is at the top • Satellite view for site recognition"}
@@ -622,7 +676,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
             {location === "springbrook" && (
               <div className="mapZoom" role="group" aria-label="Springbrook map zoom">
                 <button
-                  onClick={() => setStaticZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))}
+                  onClick={() => changeStaticZoom(staticZoom - 0.25)}
                   disabled={staticZoom <= 1}
                   aria-label="Zoom out"
                 >
@@ -630,13 +684,13 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 </button>
                 <span>{Math.round(staticZoom * 100)}%</span>
                 <button
-                  onClick={() => setStaticZoom((z) => Math.min(2, +(z + 0.25).toFixed(2)))}
+                  onClick={() => changeStaticZoom(staticZoom + 0.25)}
                   disabled={staticZoom >= 2}
                   aria-label="Zoom in"
                 >
                   +
                 </button>
-                <button onClick={() => setStaticZoom(1.25)}>Reset</button>
+                <button onClick={() => { setStaticZoom(1.25); setStaticCenter({ x: 50, y: 50 }); }}>Reset</button>
               </div>
             )}
             <div className="north">
@@ -647,6 +701,8 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
             className={`mapFrame location-${location}`}
             style={{ aspectRatio: activeLocation.ratio }}
             ref={mapRef}
+            onPointerDown={panStaticMap}
+            onWheel={zoomStaticMapAtPointer}
             onClick={() => setSelected(null)}
           >
             {mapIsInteractive ? (
@@ -663,7 +719,13 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                     : activeLocation.satellite
                 }
                 alt={`${location === "government-plaza" && mapView === "simple" ? "Simplified site plan" : "Satellite view"} of ${activeLocation.alt}`}
-                style={location === "springbrook" ? { transform: `scale(${effectiveZoom})` } : undefined}
+                style={location === "springbrook" ? {
+                  position: "absolute",
+                  width: `${effectiveZoom * 100}%`,
+                  height: `${effectiveZoom * 100}%`,
+                  left: `${50 - staticCenter.x * effectiveZoom}%`,
+                  top: `${50 - staticCenter.y * effectiveZoom}%`,
+                } : undefined}
               />
             )}{" "}
             {activeLocation.roads && (
@@ -680,8 +742,8 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 : null;
               const baseX = anchored?.x ?? item.x;
               const baseY = anchored?.y ?? item.y;
-              const displayX = mapIsInteractive ? baseX : 50 + (baseX - 50) * effectiveZoom;
-              const displayY = mapIsInteractive ? baseY : 50 + (baseY - 50) * effectiveZoom;
+              const displayX = mapIsInteractive ? baseX : 50 + (baseX - staticCenter.x) * effectiveZoom;
+              const displayY = mapIsInteractive ? baseY : 50 + (baseY - staticCenter.y) * effectiveZoom;
               return (
                 <div
                   key={item.id}
