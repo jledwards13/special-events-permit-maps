@@ -272,7 +272,7 @@ export default function Home() {
     setSpringbrookView(view);
     if (view === "parking") {
       setStaticZoom(2);
-      setStaticCenter({ x: 50, y: 25 });
+      setStaticCenter({ x: 25, y: 25 });
     } else {
       setStaticZoom(1);
       setStaticCenter({ x: 50, y: 50 });
