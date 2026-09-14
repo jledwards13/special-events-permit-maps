@@ -241,6 +241,9 @@ export default function Home() {
   const [location, setLocation] = useState<LocationKey>("government-plaza");
   const [staticZoom, setStaticZoom] = useState(1);
   const [staticCenter, setStaticCenter] = useState({ x: 50, y: 50 });
+  const [springbrookView, setSpringbrookView] = useState<
+    "entire" | "parking" | "custom"
+  >("entire");
   const [, setMapRevision] = useState(0);
   const mapIsInteractive =
     location === "city-streets" || location === "riverwalk";
@@ -258,11 +261,22 @@ export default function Home() {
   };
   const changeStaticZoom = (nextZoom: number) => {
     const zoom = Math.max(1, Math.min(2, nextZoom));
+    setSpringbrookView("custom");
     setStaticZoom(zoom);
     setStaticCenter((center) => ({
       x: clampCenter(center.x, zoom),
       y: clampCenter(center.y, zoom),
     }));
+  };
+  const showSpringbrookView = (view: "entire" | "parking") => {
+    setSpringbrookView(view);
+    if (view === "parking") {
+      setStaticZoom(2);
+      setStaticCenter({ x: 50, y: 25 });
+    } else {
+      setStaticZoom(1);
+      setStaticCenter({ x: 50, y: 50 });
+    }
   };
   const handleMapViewChange = useCallback(
     () => setMapRevision((v) => v + 1),
@@ -367,8 +381,9 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     setItems([]);
     setSelected(null);
     setMapView(next === "government-plaza" ? "simple" : "satellite");
-    setStaticZoom(next === "springbrook" ? 1.25 : 1);
+    setStaticZoom(1);
     setStaticCenter({ x: 50, y: 50 });
+    setSpringbrookView("entire");
   };
   const panStaticMap = (event: React.PointerEvent<HTMLDivElement>) => {
     if (location !== "springbrook") return;
@@ -380,6 +395,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     const startCenter = staticCenter;
     target.setPointerCapture(event.pointerId);
     const move = (e: PointerEvent) => {
+      setSpringbrookView("custom");
       setStaticCenter({
         x: clampCenter(startCenter.x - ((e.clientX - startX) / rect.width) * (100 / effectiveZoom), effectiveZoom),
         y: clampCenter(startCenter.y - ((e.clientY - startY) / rect.height) * (100 / effectiveZoom), effectiveZoom),
@@ -402,6 +418,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     if (nextZoom === effectiveZoom) return;
     const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
     const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
+    setSpringbrookView("custom");
     setStaticZoom(nextZoom);
     setStaticCenter({
       x: clampCenter(worldX - (relativeX - 0.5) * (100 / nextZoom), nextZoom),
@@ -674,23 +691,42 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               </div>
             )}
             {location === "springbrook" && (
-              <div className="mapZoom" role="group" aria-label="Springbrook map zoom">
-                <button
-                  onClick={() => changeStaticZoom(staticZoom - 0.25)}
-                  disabled={staticZoom <= 1}
-                  aria-label="Zoom out"
+              <div className="springbrookControls">
+                <div
+                  className="viewToggle"
+                  role="group"
+                  aria-label="Springbrook aerial view"
                 >
-                  −
-                </button>
-                <span>{Math.round(staticZoom * 100)}%</span>
-                <button
-                  onClick={() => changeStaticZoom(staticZoom + 0.25)}
-                  disabled={staticZoom >= 2}
-                  aria-label="Zoom in"
-                >
-                  +
-                </button>
-                <button onClick={() => { setStaticZoom(1.25); setStaticCenter({ x: 50, y: 50 }); }}>Reset</button>
+                  <button
+                    className={springbrookView === "entire" ? "active" : ""}
+                    onClick={() => showSpringbrookView("entire")}
+                  >
+                    Entire Park View
+                  </button>
+                  <button
+                    className={springbrookView === "parking" ? "active" : ""}
+                    onClick={() => showSpringbrookView("parking")}
+                  >
+                    Top Parking Lot View
+                  </button>
+                </div>
+                <div className="mapZoom" role="group" aria-label="Springbrook map zoom">
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom - 0.25)}
+                    disabled={staticZoom <= 1}
+                    aria-label="Zoom out"
+                  >
+                    −
+                  </button>
+                  <span>{Math.round(staticZoom * 100)}%</span>
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom + 0.25)}
+                    disabled={staticZoom >= 2}
+                    aria-label="Zoom in"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             )}
             <div className="north">
