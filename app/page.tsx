@@ -260,7 +260,7 @@ export default function Home() {
     return Math.max(edge, Math.min(100 - edge, value));
   };
   const changeStaticZoom = (nextZoom: number) => {
-    const zoom = Math.max(1, Math.min(2, nextZoom));
+    const zoom = Math.max(1, Math.min(3, nextZoom));
     setSpringbrookView("custom");
     setStaticZoom(zoom);
     setStaticCenter((center) => ({
@@ -271,8 +271,10 @@ export default function Home() {
   const showSpringbrookView = (view: "entire" | "parking") => {
     setSpringbrookView(view);
     if (view === "parking") {
-      setStaticZoom(2);
-      setStaticCenter({ x: 25, y: 25 });
+      const parkingZoom = 2.75;
+      const parkingEdge = 50 / parkingZoom;
+      setStaticZoom(parkingZoom);
+      setStaticCenter({ x: parkingEdge, y: parkingEdge });
     } else {
       setStaticZoom(1);
       setStaticCenter({ x: 50, y: 50 });
@@ -414,7 +416,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = (event.clientX - rect.left) / rect.width;
     const relativeY = (event.clientY - rect.top) / rect.height;
-    const nextZoom = Math.max(1, Math.min(2, effectiveZoom + (event.deltaY < 0 ? 0.25 : -0.25)));
+    const nextZoom = Math.max(1, Math.min(3, effectiveZoom + (event.deltaY < 0 ? 0.25 : -0.25)));
     if (nextZoom === effectiveZoom) return;
     const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
     const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
@@ -721,7 +723,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                   <span>{Math.round(staticZoom * 100)}%</span>
                   <button
                     onClick={() => changeStaticZoom(staticZoom + 0.25)}
-                    disabled={staticZoom >= 2}
+                    disabled={staticZoom >= 3}
                     aria-label="Zoom in"
                   >
                     +
