@@ -738,6 +738,13 @@ footer {
 .viewToggle button:hover:not(.active) {
   background: #e7ecef;
 }
+.springbrookControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .mapZoom {
   display: flex;
   align-items: center;
