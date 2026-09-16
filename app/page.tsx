@@ -173,10 +173,10 @@ const locations: Record<
   "snow-hinton": {
     name: "Snow Hinton Park",
     simple: "",
-    satellite: "/snow-hinton-park-satellite.jpeg",
-    alt: "Snow Hinton Park",
+    satellite: "/snow-hinton-park-aerial-updated.jpg",
+    alt: "Updated overhead aerial of Snow Hinton Park",
     roads: false,
-    ratio: 0.907,
+    ratio: 1.239,
     rates: [
       "Ellipse: $375/hr ($1,500 minimum) or $3,000/day",
       "Entire park: $500/hr ($2,000 minimum) or $4,000/day",
@@ -244,6 +244,7 @@ export default function Home() {
   const [springbrookView, setSpringbrookView] = useState<
     "entire" | "parking" | "custom"
   >("entire");
+  const [snowHintonView, setSnowHintonView] = useState<"aerial" | "pavilions">("aerial");
   const [, setMapRevision] = useState(0);
   const mapIsInteractive =
     location === "city-streets" || location === "riverwalk";
@@ -385,6 +386,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     setMapView(next === "government-plaza" ? "simple" : "satellite");
     setStaticZoom(1);
     setStaticCenter({ x: 50, y: 50 });
+    setSnowHintonView("aerial");
     setSpringbrookView("entire");
   };
   const panStaticMap = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -692,6 +694,26 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 </button>
               </div>
             )}
+            {location === "snow-hinton" && (
+              <div
+                className="viewToggle"
+                role="group"
+                aria-label="Snow Hinton aerial view"
+              >
+                <button
+                  className={snowHintonView === "aerial" ? "active" : ""}
+                  onClick={() => setSnowHintonView("aerial")}
+                >
+                  Planning Aerial
+                </button>
+                <button
+                  className={snowHintonView === "pavilions" ? "active" : ""}
+                  onClick={() => setSnowHintonView("pavilions")}
+                >
+                  Pavilion Reference
+                </button>
+              </div>
+            )}
             {location === "springbrook" && (
               <div className="springbrookControls">
                 <div
@@ -754,6 +776,8 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 src={
                   location === "government-plaza" && mapView === "simple"
                     ? activeLocation.simple
+                    : location === "snow-hinton" && snowHintonView === "pavilions"
+                      ? "/snow-hinton-pavilion-reference.png"
                     : activeLocation.satellite
                 }
                 alt={`${location === "government-plaza" && mapView === "simple" ? "Simplified site plan" : "Satellite view"} of ${activeLocation.alt}`}
@@ -879,6 +903,42 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               ))
             )}
           </div>
+          {location === "snow-hinton" && (
+            <details className="siteReferences">
+              <summary>Snow Hinton reference photos</summary>
+              <div className="referenceGroup">
+                <h3>Ellipse Pavilion</h3>
+                <div className="referenceGrid pavilionReferences">
+                  <a href="/snow-hinton-ellipse-pavilion-2.jpg" target="_blank" rel="noreferrer">
+                    <img src="/snow-hinton-ellipse-pavilion-2.jpg" alt="Exterior reference view of the Snow Hinton Ellipse Pavilion" />
+                    <span>Ellipse Pavilion — exterior</span>
+                  </a>
+                  <a href="/snow-hinton-ellipse-pavilion-4.jpeg" target="_blank" rel="noreferrer">
+                    <img src="/snow-hinton-ellipse-pavilion-4.jpeg" alt="Interior reference view of the Snow Hinton Ellipse Pavilion and picnic tables" />
+                    <span>Ellipse Pavilion — interior</span>
+                  </a>
+                </div>
+              </div>
+              <div className="referenceGroup">
+                <h3>Removable bollard locations</h3>
+                <p>Use these access-point photos when planning vehicle entry, deliveries, or temporary equipment access.</p>
+                <div className="referenceGrid bollardReferences">
+                  {[
+                    ["/snow-hinton-bollard-ellipse-entrance.jpg", "Ellipse Pavilion Entrance"],
+                    ["/snow-hinton-bollard-north-1.jpg", "North Main Entrance — Location 1"],
+                    ["/snow-hinton-bollard-north-2.jpg", "North Main Entrance — Location 2"],
+                    ["/snow-hinton-bollard-south-1.jpg", "South Main Entrance — Location 1"],
+                    ["/snow-hinton-bollard-south-2.jpg", "South Main Entrance — Location 2"],
+                  ].map(([src, label]) => (
+                    <a href={src} target="_blank" rel="noreferrer" key={src}>
+                      <img src={src} alt={`${label} removable bollards at Snow Hinton Park`} />
+                      <span>{label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </details>
+          )}
         </section>
         <aside className="detailPanel">
           <h2>Selected item</h2>
@@ -966,7 +1026,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               placeholder="Include dimensions, access instructions, power needs, or other information…"
             />
           </label>
-          {(["snow-hinton", "kaulton"] as LocationKey[]).includes(location) && (
+          {(["kaulton"] as LocationKey[]).includes(location) && (
             <section className="mapNotice">
               <b>Map update notice</b>
               <p>Renovations have taken place at this park. Some features shown on the aerial map may differ from the current site.</p>
