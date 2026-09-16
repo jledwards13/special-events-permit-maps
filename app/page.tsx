@@ -173,7 +173,7 @@ const locations: Record<
   "snow-hinton": {
     name: "Snow Hinton Park",
     simple: "",
-    satellite: "/snow-hinton-park-aerial-updated.jpg",
+    satellite: "/snow-hinton-park-aerial-hd.jpg",
     alt: "Updated overhead aerial of Snow Hinton Park",
     roads: false,
     ratio: 1.239,
@@ -687,7 +687,9 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 {mapIsInteractive
                   ? "Pan or zoom freely—placed items remain anchored to their map location"
                   : staticMapCanZoom
-                    ? "Drag to pan • Scroll at any spot or double-click it to zoom there"
+                    ? location === "snow-hinton"
+                      ? "Drag to pan • Scroll at any spot or double-click it to zoom there • East is at the top"
+                      : "Drag to pan • Scroll at any spot or double-click it to zoom there"
                   : activeLocation.roads
                     ? "North is at the top • Road labels are for orientation"
                     : "North is at the top • Satellite view for site recognition"}
@@ -791,8 +793,12 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 </div>
               </div>
             )}
-            <div className="north">
-              ↑<span>N</span>
+            <div
+              className={"north " + (location === "snow-hinton" ? "northLeft" : "")}
+              title={location === "snow-hinton" ? "North points left; east is at the top" : "North is at the top"}
+              aria-label={location === "snow-hinton" ? "North points left" : "North points up"}
+            >
+              {location === "snow-hinton" ? "←" : "↑"}<span>N</span>
             </div>
           </div>
           <div
