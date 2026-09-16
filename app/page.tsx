@@ -173,7 +173,7 @@ const locations: Record<
   "snow-hinton": {
     name: "Snow Hinton Park",
     simple: "",
-    satellite: "/snow-hinton-park-aerial-hd.jpg",
+    satellite: "/snow-hinton-park-aerial-clear.jpg",
     alt: "Updated overhead aerial of Snow Hinton Park",
     roads: false,
     ratio: 1.239,
@@ -828,10 +828,14 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                 alt={`${location === "government-plaza" && mapView === "simple" ? "Simplified site plan" : "Satellite view"} of ${activeLocation.alt}`}
                 style={staticMapCanZoom ? {
                   position: "absolute",
-                  width: `${effectiveZoom * 100}%`,
-                  height: `${effectiveZoom * 100}%`,
-                  left: `${50 - staticCenter.x * effectiveZoom}%`,
-                  top: `${50 - staticCenter.y * effectiveZoom}%`,
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "none",
+                  left: 0,
+                  top: 0,
+                  transformOrigin: "center",
+                  transform: `translate(${(50 - staticCenter.x) * effectiveZoom}%, ${(50 - staticCenter.y) * effectiveZoom}%) scale(${effectiveZoom})`,
+                  willChange: "transform",
                 } : undefined}
               />
             )}{" "}
