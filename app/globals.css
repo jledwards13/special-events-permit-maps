@@ -789,6 +789,73 @@ footer {
 .mapFrame.location-springbrook:active {
   cursor: grabbing;
 }
+.siteReferences {
+  margin-top: 10px;
+  border: 1px solid #c7d0d6;
+  border-radius: 6px;
+  background: #f7f9fa;
+  color: #263844;
+}
+.siteReferences summary {
+  padding: 10px 12px;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.referenceGroup {
+  padding: 0 12px 12px;
+}
+.referenceGroup + .referenceGroup {
+  padding-top: 10px;
+  border-top: 1px solid #dce2e6;
+}
+.referenceGroup h3 {
+  margin: 0 0 7px;
+  font: 700 13px Georgia, serif;
+  color: var(--navy);
+}
+.referenceGroup > p {
+  margin: -2px 0 8px;
+  color: #5f6d76;
+  font-size: 10px;
+  line-height: 1.35;
+}
+.referenceGrid {
+  display: grid;
+  gap: 8px;
+}
+.pavilionReferences {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.bollardReferences {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.referenceGrid a {
+  display: grid;
+  grid-template-rows: 92px auto;
+  overflow: hidden;
+  border: 1px solid #cbd4da;
+  border-radius: 5px;
+  background: #fff;
+  color: #263844;
+  text-decoration: none;
+}
+.referenceGrid a:hover {
+  border-color: var(--gold);
+  box-shadow: 0 2px 7px #0002;
+}
+.referenceGrid img {
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+}
+.referenceGrid span {
+  padding: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.25;
+}
 .printValue {
   display: none;
 }
@@ -904,6 +971,7 @@ footer {
   .printButton,
   .viewToggle,
   .mapZoom,
+  .siteReferences,
   .toolPanel,
   .resizeHandle,
   .rotateHandle,
@@ -1047,6 +1115,10 @@ footer {
   .locationBar button,
   .locationBar label {
     min-height: 42px;
+  }
+  .pavilionReferences,
+  .bollardReferences {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media print {
