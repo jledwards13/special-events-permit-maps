@@ -186,6 +186,15 @@ textarea {
   font-size: 10px;
   margin-top: 5px;
 }
+.north.northLeft {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+.north.northLeft span {
+  margin-top: 0;
+}
 .mapFrame {
   position: relative;
   overflow: hidden;
