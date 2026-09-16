@@ -255,14 +255,15 @@ export default function Home() {
       items.findIndex((other) => other.kind === item.kind) === index,
   );
   const activeLocation = locations[location];
-  const effectiveZoom = location === "springbrook" ? staticZoom : 1;
+  const staticMapCanZoom = location === "springbrook" || location === "snow-hinton";
+  const effectiveZoom = staticMapCanZoom ? staticZoom : 1;
   const clampCenter = (value: number, zoom: number) => {
     const edge = 50 / zoom;
     return Math.max(edge, Math.min(100 - edge, value));
   };
   const changeStaticZoom = (nextZoom: number) => {
     const zoom = Math.max(1, Math.min(3, nextZoom));
-    setSpringbrookView("custom");
+    if (location === "springbrook") setSpringbrookView("custom");
     setStaticZoom(zoom);
     setStaticCenter((center) => ({
       x: clampCenter(center.x, zoom),
@@ -311,7 +312,7 @@ export default function Home() {
                           : kind === "note"
                             ? { width: 100, height: 38 }
                             : { width: 76, height: 42 };
-    const scaledDefaults = location === "springbrook"
+    const scaledDefaults = location === "springbrook" || location === "snow-hinton"
       ? { width: Math.round(defaults.width * 0.55), height: Math.round(defaults.height * 0.55) }
       : defaults;
     const geo = mapIsInteractive
@@ -390,7 +391,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     setSpringbrookView("entire");
   };
   const panStaticMap = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (location !== "springbrook") return;
+    if (!staticMapCanZoom) return;
     event.preventDefault();
     const target = event.currentTarget;
     const rect = target.getBoundingClientRect();
@@ -399,7 +400,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     const startCenter = staticCenter;
     target.setPointerCapture(event.pointerId);
     const move = (e: PointerEvent) => {
-      setSpringbrookView("custom");
+      if (location === "springbrook") setSpringbrookView("custom");
       setStaticCenter({
         x: clampCenter(startCenter.x - ((e.clientX - startX) / rect.width) * (100 / effectiveZoom), effectiveZoom),
         y: clampCenter(startCenter.y - ((e.clientY - startY) / rect.height) * (100 / effectiveZoom), effectiveZoom),
@@ -413,7 +414,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     target.addEventListener("pointerup", up);
   };
   const zoomStaticMapAtPointer = (event: React.WheelEvent<HTMLDivElement>) => {
-    if (location !== "springbrook") return;
+    if (!staticMapCanZoom) return;
     event.preventDefault();
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = (event.clientX - rect.left) / rect.width;
@@ -422,7 +423,24 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     if (nextZoom === effectiveZoom) return;
     const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
     const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
-    setSpringbrookView("custom");
+    if (location === "springbrook") setSpringbrookView("custom");
+    setStaticZoom(nextZoom);
+    setStaticCenter({
+      x: clampCenter(worldX - (relativeX - 0.5) * (100 / nextZoom), nextZoom),
+      y: clampCenter(worldY - (relativeY - 0.5) * (100 / nextZoom), nextZoom),
+    });
+  };
+  const zoomStaticMapAtPoint = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!staticMapCanZoom) return;
+    event.preventDefault();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const relativeX = (event.clientX - rect.left) / rect.width;
+    const relativeY = (event.clientY - rect.top) / rect.height;
+    const nextZoom = Math.min(3, effectiveZoom + 0.5);
+    if (nextZoom === effectiveZoom) return;
+    const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
+    const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
+    if (location === "springbrook") setSpringbrookView("custom");
     setStaticZoom(nextZoom);
     setStaticCenter({
       x: clampCenter(worldX - (relativeX - 0.5) * (100 / nextZoom), nextZoom),
@@ -646,8 +664,9 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
             ))}
           </div>
           <small className="scaleNote">
-            Tent presets use consistent proportional footprints: 10×10, 10×20,
-            and 20×30.
+            {location === "snow-hinton"
+              ? "Snow Hinton item footprints are calibrated to the ellipse pavilion; 2–3 preset 10×10 tents fit across it."
+              : "Tent presets use consistent proportional footprints: 10×10, 10×20, and 20×30."}
           </small>
           <div className="instructions">
             <b>Map tips</b>
@@ -667,8 +686,8 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               <p>
                 {mapIsInteractive
                   ? "Pan or zoom freely—placed items remain anchored to their map location"
-                  : location === "springbrook"
-                    ? "Drag to move around the park • Scroll or use +/− to zoom"
+                  : staticMapCanZoom
+                    ? "Drag to pan • Scroll at any spot or double-click it to zoom there"
                   : activeLocation.roads
                     ? "North is at the top • Road labels are for orientation"
                     : "North is at the top • Satellite view for site recognition"}
@@ -695,23 +714,42 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
               </div>
             )}
             {location === "snow-hinton" && (
-              <div
-                className="viewToggle"
-                role="group"
-                aria-label="Snow Hinton aerial view"
-              >
-                <button
-                  className={snowHintonView === "aerial" ? "active" : ""}
-                  onClick={() => setSnowHintonView("aerial")}
+              <div className="springbrookControls">
+                <div
+                  className="viewToggle"
+                  role="group"
+                  aria-label="Snow Hinton aerial view"
                 >
-                  Planning Aerial
-                </button>
-                <button
-                  className={snowHintonView === "pavilions" ? "active" : ""}
-                  onClick={() => setSnowHintonView("pavilions")}
-                >
-                  Pavilion Reference
-                </button>
+                  <button
+                    className={snowHintonView === "aerial" ? "active" : ""}
+                    onClick={() => setSnowHintonView("aerial")}
+                  >
+                    Planning Aerial
+                  </button>
+                  <button
+                    className={snowHintonView === "pavilions" ? "active" : ""}
+                    onClick={() => setSnowHintonView("pavilions")}
+                  >
+                    Pavilion Reference
+                  </button>
+                </div>
+                <div className="mapZoom" role="group" aria-label="Snow Hinton map zoom">
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom - 0.25)}
+                    disabled={staticZoom <= 1}
+                    aria-label="Zoom out"
+                  >
+                    −
+                  </button>
+                  <span>{Math.round(staticZoom * 100)}%</span>
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom + 0.25)}
+                    disabled={staticZoom >= 3}
+                    aria-label="Zoom in"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             )}
             {location === "springbrook" && (
@@ -763,6 +801,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
             ref={mapRef}
             onPointerDown={panStaticMap}
             onWheel={zoomStaticMapAtPointer}
+            onDoubleClick={zoomStaticMapAtPoint}
             onClick={() => setSelected(null)}
           >
             {mapIsInteractive ? (
@@ -781,7 +820,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                     : activeLocation.satellite
                 }
                 alt={`${location === "government-plaza" && mapView === "simple" ? "Simplified site plan" : "Satellite view"} of ${activeLocation.alt}`}
-                style={location === "springbrook" ? {
+                style={staticMapCanZoom ? {
                   position: "absolute",
                   width: `${effectiveZoom * 100}%`,
                   height: `${effectiveZoom * 100}%`,
