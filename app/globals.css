@@ -788,14 +788,18 @@ footer {
   font-weight: 800;
   text-align: center;
 }
-.mapFrame.location-springbrook > img {
+.mapFrame.location-springbrook > img,
+.mapFrame.location-snow-hinton > img {
   transform-origin: center;
   pointer-events: none;
+  max-width: none;
 }
-.mapFrame.location-springbrook {
+.mapFrame.location-springbrook,
+.mapFrame.location-snow-hinton {
   cursor: grab;
 }
-.mapFrame.location-springbrook:active {
+.mapFrame.location-springbrook:active,
+.mapFrame.location-snow-hinton:active {
   cursor: grabbing;
 }
 .siteReferences {
