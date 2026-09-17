@@ -143,10 +143,10 @@ const locations: Record<
   kaulton: {
     name: "Kaulton Park",
     simple: "",
-    satellite: "/kaulton-park-satellite.jpeg",
-    alt: "Kaulton Park",
+    satellite: "/kaulton-park-aerial-overhead.png",
+    alt: "Updated overhead aerial of Kaulton Park",
     roads: false,
-    ratio: 1.71,
+    ratio: 1.709,
     rates: [
       "Entire park: $100/hr ($400 minimum) or $800/day",
       "Pavilion: $30/hr ($120 minimum)",
