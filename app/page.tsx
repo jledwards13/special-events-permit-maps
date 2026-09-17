@@ -173,10 +173,10 @@ const locations: Record<
   "snow-hinton": {
     name: "Snow Hinton Park",
     simple: "",
-    satellite: "/snow-hinton-park-aerial-clear.jpg",
+    satellite: "/snow-hinton-park-aerial-ultra.jpg",
     alt: "Updated overhead aerial of Snow Hinton Park",
     roads: false,
-    ratio: 1.239,
+    ratio: 1.243,
     rates: [
       "Ellipse: $375/hr ($1,500 minimum) or $3,000/day",
       "Entire park: $500/hr ($2,000 minimum) or $4,000/day",
@@ -255,14 +255,19 @@ export default function Home() {
       items.findIndex((other) => other.kind === item.kind) === index,
   );
   const activeLocation = locations[location];
-  const staticMapCanZoom = location === "springbrook" || location === "snow-hinton";
+  const staticMapCanZoom =
+    location === "springbrook" ||
+    location === "snow-hinton" ||
+    location === "kaulton";
+  const staticZoomMax =
+    location === "snow-hinton" ? 4.5 : location === "kaulton" ? 4 : 3;
   const effectiveZoom = staticMapCanZoom ? staticZoom : 1;
   const clampCenter = (value: number, zoom: number) => {
     const edge = 50 / zoom;
     return Math.max(edge, Math.min(100 - edge, value));
   };
   const changeStaticZoom = (nextZoom: number) => {
-    const zoom = Math.max(1, Math.min(3, nextZoom));
+    const zoom = Math.max(1, Math.min(staticZoomMax, nextZoom));
     if (location === "springbrook") setSpringbrookView("custom");
     setStaticZoom(zoom);
     setStaticCenter((center) => ({
@@ -419,7 +424,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = (event.clientX - rect.left) / rect.width;
     const relativeY = (event.clientY - rect.top) / rect.height;
-    const nextZoom = Math.max(1, Math.min(3, effectiveZoom + (event.deltaY < 0 ? 0.25 : -0.25)));
+    const nextZoom = Math.max(1, Math.min(staticZoomMax, effectiveZoom + (event.deltaY < 0 ? 0.25 : -0.25)));
     if (nextZoom === effectiveZoom) return;
     const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
     const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
@@ -436,7 +441,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = (event.clientX - rect.left) / rect.width;
     const relativeY = (event.clientY - rect.top) / rect.height;
-    const nextZoom = Math.min(3, effectiveZoom + 0.5);
+    const nextZoom = Math.min(staticZoomMax, effectiveZoom + 0.5);
     if (nextZoom === effectiveZoom) return;
     const worldX = staticCenter.x + (relativeX - 0.5) * (100 / effectiveZoom);
     const worldY = staticCenter.y + (relativeY - 0.5) * (100 / effectiveZoom);
@@ -746,7 +751,7 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                   <span>{Math.round(staticZoom * 100)}%</span>
                   <button
                     onClick={() => changeStaticZoom(staticZoom + 0.25)}
-                    disabled={staticZoom >= 3}
+                    disabled={staticZoom >= staticZoomMax}
                     aria-label="Zoom in"
                   >
                     +
@@ -785,7 +790,28 @@ const updateSelected = (patch: Partial<PlacedItem>) => {
                   <span>{Math.round(staticZoom * 100)}%</span>
                   <button
                     onClick={() => changeStaticZoom(staticZoom + 0.25)}
-                    disabled={staticZoom >= 3}
+                    disabled={staticZoom >= staticZoomMax}
+                    aria-label="Zoom in"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
+            {location === "kaulton" && (
+              <div className="springbrookControls">
+                <div className="mapZoom" role="group" aria-label="Kaulton map zoom">
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom - 0.25)}
+                    disabled={staticZoom <= 1}
+                    aria-label="Zoom out"
+                  >
+                    −
+                  </button>
+                  <span>{Math.round(staticZoom * 100)}%</span>
+                  <button
+                    onClick={() => changeStaticZoom(staticZoom + 0.25)}
+                    disabled={staticZoom >= staticZoomMax}
                     aria-label="Zoom in"
                   >
                     +
